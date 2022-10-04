@@ -5,6 +5,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
@@ -27,18 +28,24 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     override val _viewModel: SaveReminderViewModel by inject()
     private lateinit var map: GoogleMap
     private lateinit var binding: FragmentSelectLocationBinding
-    private val REQUEST_LOCATION_PERMISSION = 1
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
 
-        enablePermission()
-
-        setMapLongClick(map)
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            map.isMyLocationEnabled = true
+        }
+        setMapPOI(map)
         setMapStyle(map)
         setMyLocation(map)
     }
+
+
 
     private fun setMyLocation(map: GoogleMap) {
         val zoomLevel = 13f
@@ -46,13 +53,8 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         if (ActivityCompat.checkSelfPermission(
                 this.requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this.requireContext(),
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            return
-        }
+            ) != PackageManager.PERMISSION_GRANTED ) return
+
         fusedLocationProviderClient.lastLocation.addOnSuccessListener(requireActivity())
         {
             it?.let {
@@ -63,34 +65,6 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
     }
 
-    private fun enablePermission() {
-        if (ActivityCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            map.isMyLocationEnabled = true
-        } else {
-            ActivityCompat.requestPermissions(
-                requireActivity(),
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                REQUEST_LOCATION_PERMISSION
-            )
-        }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_LOCATION_PERMISSION) {
-            if (grantResults.isNotEmpty() && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                enablePermission()
-            }
-        }
-    }
 
     private fun setMapStyle(map: GoogleMap) {
         try {
@@ -99,10 +73,10 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         }
     }
 
-    private fun setMapLongClick(map: GoogleMap) {
-        map.setOnMapLongClickListener {
+    private fun setMapPOI(map: GoogleMap) {
+        map.setOnPoiClickListener {
             it?.let {
-                map.addMarker(MarkerOptions().position(it))
+                map.addMarker(MarkerOptions().position(it.latLng).title(it.name)).showInfoWindow()
                 onLocationSelected(it)
             }
         }
@@ -132,13 +106,15 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         return binding.root
     }
 
-    private fun onLocationSelected(latLng: LatLng) {
-        //         When the user confirms on the selected location,
-        //         send back the selected location details to the view model
-        //         and navigate back to the previous fragment to save the reminder
-        //         and add the geofence
-//        findNavController().navigate()
+    private fun onLocationSelected(p: PointOfInterest) {
+        _viewModel.apply {
+            reminderSelectedLocationStr.value = p.name
+            latitude.value = p.latLng.latitude
+            longitude.value = p.latLng.longitude
+            selectedPOI.value = p
+        }
 
+        activity?.onBackPressed()
 
     }
 

@@ -1,15 +1,29 @@
 package com.udacity.project4.locationreminders.reminderslist
 
+import android.Manifest
+import android.annotation.TargetApi
 import android.content.Context
+import android.content.Intent
+import android.content.IntentSender
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.provider.Settings
 import android.util.Log
 import android.view.*
+import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import com.firebase.ui.auth.AuthUI
+import com.google.android.gms.common.api.ResolvableApiException
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.udacity.project4.BuildConfig
 import com.udacity.project4.R
 import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.base.NavigationCommand
@@ -22,6 +36,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class ReminderListFragment : BaseFragment() {
     //use Koin to retrieve the ViewModel instance
     override val _viewModel: RemindersListViewModel by viewModel()
+
     private lateinit var binding: FragmentRemindersBinding
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,16 +48,39 @@ class ReminderListFragment : BaseFragment() {
                 R.layout.fragment_reminders, container, false
             )
         binding.viewModel = _viewModel
-
         setHasOptionsMenu(true)
         setDisplayHomeAsUpEnabled(false)
         setTitle(getString(R.string.app_name))
-
+        enableLocationPermission()
         binding.refreshLayout.setOnRefreshListener { _viewModel.loadReminders() }
 
         return binding.root
     }
-
+    private fun enableLocationPermission() {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                10
+            )
+        }
+    }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        Log.i("asdf", "$requestCode")
+        if (requestCode == 10) {
+            if (grantResults.isNotEmpty() && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                enableLocationPermission()
+            }
+        }
+    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = this
@@ -78,9 +116,9 @@ class ReminderListFragment : BaseFragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.logout -> {
-              //  val editor = requireActivity().getSharedPreferences("sharedPreferences", Context.MODE_PRIVATE).edit()
-              //  editor.putString("UserID", null)
-              //  FirebaseAuth.getInstance().signOut()
+                //  val editor = requireActivity().getSharedPreferences("sharedPreferences", Context.MODE_PRIVATE).edit()
+                //  editor.putString("UserID", null)
+                //  FirebaseAuth.getInstance().signOut()
             }
         }
         return super.onOptionsItemSelected(item)
@@ -94,3 +132,5 @@ class ReminderListFragment : BaseFragment() {
     }
 
 }
+
+
