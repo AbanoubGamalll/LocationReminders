@@ -25,9 +25,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.udacity.project4.BuildConfig
 import com.udacity.project4.R
+import com.udacity.project4.authentication.AuthenticationActivity
 import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.databinding.FragmentRemindersBinding
+import com.udacity.project4.locationreminders.RemindersActivity
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
 import com.udacity.project4.utils.setTitle
 import com.udacity.project4.utils.setup
@@ -54,8 +56,10 @@ class ReminderListFragment : BaseFragment() {
         enableLocationPermission()
         binding.refreshLayout.setOnRefreshListener { _viewModel.loadReminders() }
 
+
         return binding.root
     }
+
     private fun enableLocationPermission() {
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
@@ -68,19 +72,20 @@ class ReminderListFragment : BaseFragment() {
             )
         }
     }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        Log.i("asdf", "$requestCode")
         if (requestCode == 10) {
             if (grantResults.isNotEmpty() && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 enableLocationPermission()
             }
         }
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = this
@@ -116,9 +121,18 @@ class ReminderListFragment : BaseFragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.logout -> {
-                //  val editor = requireActivity().getSharedPreferences("sharedPreferences", Context.MODE_PRIVATE).edit()
-                //  editor.putString("UserID", null)
-                //  FirebaseAuth.getInstance().signOut()
+                FirebaseAuth.getInstance().signOut()
+
+                val sharedPreferences = requireActivity().getSharedPreferences(
+                    "sharedPreferences",
+                    Context.MODE_PRIVATE
+                )
+                val editor: SharedPreferences.Editor = sharedPreferences.edit()
+                editor.putBoolean("user", false)
+                editor.apply()
+
+                startActivity(Intent(requireActivity(), AuthenticationActivity::class.java))
+                requireActivity().finish()
             }
         }
         return super.onOptionsItemSelected(item)

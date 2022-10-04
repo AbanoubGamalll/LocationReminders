@@ -42,4 +42,5 @@
     <string name="error_adding_geofence">Error Happened, Can\'t Add Geofence</string>
 
     <string name="google_maps_key">AIzaSyDtH1C9DHdWDmtfGzgQvoFDh6Q3DjAEYMo</string>
+    <string name="login_or_signup">Login or SignUp</string>
 </resources>
