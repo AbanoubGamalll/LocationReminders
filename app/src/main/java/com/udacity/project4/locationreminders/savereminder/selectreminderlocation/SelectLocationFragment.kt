@@ -32,7 +32,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     private lateinit var map: GoogleMap
     private lateinit var binding: FragmentSelectLocationBinding
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-
+    private lateinit var loca: LatLng
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
 
@@ -50,19 +50,20 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     }
 
 
-
     private fun setMyLocation(map: GoogleMap) {
         val zoomLevel = 13f
 
         if (ActivityCompat.checkSelfPermission(
                 this.requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED ) return
+            ) != PackageManager.PERMISSION_GRANTED
+        ) return
 
         fusedLocationProviderClient.lastLocation.addOnSuccessListener(requireActivity())
         {
             it?.let {
                 val loc = LatLng(it.latitude, it.longitude)
+                loca = loc
                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, zoomLevel))
             }
         }
@@ -113,8 +114,9 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     private fun onLocationSelected(p: PointOfInterest) {
         _viewModel.apply {
             reminderSelectedLocationStr.value = p.name
-            latitude.value = p.latLng.latitude
-            longitude.value = p.latLng.longitude
+            latitude.value = /*p.latLng.latitude*/loca.latitude
+            longitude.value = /*p.latLng.longitude*/ loca.longitude
+            Log.i("asd","${loca.latitude} ${loca.longitude}")
             selectedPOI.value = p
         }
 

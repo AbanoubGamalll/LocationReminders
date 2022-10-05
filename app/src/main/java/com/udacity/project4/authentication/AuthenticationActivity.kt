@@ -27,7 +27,7 @@ class AuthenticationActivity : AppCompatActivity() {
 
         SP = this.getSharedPreferences("sharedPreferences", Context.MODE_PRIVATE)
         Log.i("asdUserActive", "${SP.getBoolean("user", false)}")
-        if (SP.getBoolean("user", false)) goToNextActivity()
+        /*if (SP.getBoolean("user", false))*/ goToNextActivity()
 
 //          TO DO: a bonus is to customize the sign in flow to look nice using :
         //https://github.com/firebase/FirebaseUI-Android/blob/master/auth/README.md#custom-layout
