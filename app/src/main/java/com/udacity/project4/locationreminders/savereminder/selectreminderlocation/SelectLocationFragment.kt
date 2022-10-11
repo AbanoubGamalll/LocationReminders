@@ -6,17 +6,23 @@ import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.os.Bundle
-import android.util.Log
 import android.view.*
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import com.google.android.gms.common.api.ResolvableApiException
-import com.google.android.gms.location.*
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.*
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.PointOfInterest
 import com.google.android.material.snackbar.Snackbar
 import com.udacity.project4.R
 import com.udacity.project4.base.BaseFragment
@@ -27,12 +33,11 @@ import org.koin.android.ext.android.inject
 
 class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
-    //Use Koin to get the view model of the SaveReminder
     override val _viewModel: SaveReminderViewModel by inject()
     private lateinit var map: GoogleMap
     private lateinit var binding: FragmentSelectLocationBinding
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-    private lateinit var loca: LatLng
+
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
 
@@ -45,10 +50,9 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         }
         checkDeviceLocationSettingsAndStartGeofence()
         setMapPOI(map)
+        setLongClick(map)
         setMapStyle(map)
-
     }
-
 
     private fun setMyLocation(map: GoogleMap) {
         val zoomLevel = 13f
@@ -62,9 +66,14 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         fusedLocationProviderClient.lastLocation.addOnSuccessListener(requireActivity())
         {
             it?.let {
-                val loc = LatLng(it.latitude, it.longitude)
-                loca = loc
-                map.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, zoomLevel))
+                map.animateCamera(
+                    CameraUpdateFactory.newLatLngZoom(
+                        LatLng(
+                            it.latitude,
+                            it.longitude
+                        ), zoomLevel
+                    )
+                )
             }
         }
 
@@ -80,10 +89,21 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
     private fun setMapPOI(map: GoogleMap) {
         map.setOnPoiClickListener {
+            map.clear()
             it?.let {
                 map.addMarker(MarkerOptions().position(it.latLng).title(it.name)).showInfoWindow()
                 onLocationSelected(it)
             }
+        }
+    }
+
+    private fun setLongClick(map: GoogleMap) {
+        map.setOnMapLongClickListener() {
+            val loc = LatLng(it.latitude, it.longitude)
+            map.clear()
+            map.addMarker(MarkerOptions().position(loc))
+                .showInfoWindow()
+            onLocationSelected(PointOfInterest(loc, "${loc.latitude},${loc.longitude}", "${loc.latitude},${loc.longitude}"))
         }
     }
 
@@ -98,6 +118,12 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
         setHasOptionsMenu(true)
         setDisplayHomeAsUpEnabled(true)
+        binding.btnSelectLocation.setOnClickListener {
+            if (_viewModel.latitude.value != null && _viewModel.longitude.value != null)
+                activity?.onBackPressed()
+            else
+                Toast.makeText(requireActivity(), "Select Location!", Toast.LENGTH_SHORT).show()
+        }
 
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(this)
@@ -114,14 +140,10 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     private fun onLocationSelected(p: PointOfInterest) {
         _viewModel.apply {
             reminderSelectedLocationStr.value = p.name
-            latitude.value = /*p.latLng.latitude*/loca.latitude
-            longitude.value = /*p.latLng.longitude*/ loca.longitude
-            Log.i("asd","${loca.latitude} ${loca.longitude}")
+            latitude.value = p.latLng.latitude
+            longitude.value = p.latLng.longitude
             selectedPOI.value = p
         }
-
-        activity?.onBackPressed()
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
