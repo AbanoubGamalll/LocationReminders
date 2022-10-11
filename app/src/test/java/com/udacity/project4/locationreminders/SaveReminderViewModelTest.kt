@@ -1,5 +1,6 @@
 package com.udacity.project4.locationreminders
 
+import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -89,6 +90,26 @@ class SaveReminderViewModelTest {
 
         viewModel.validateAndSaveReminder(reminder)
         assertEquals(viewModel.showSnackBarInt.getOrAwaitValue(), R.string.err_select_location)
+    }
+
+    @Test
+    fun `validateAndSaveReminder & Show Toast`() = mainCoroutineRule.runBlockingTest {
+        // title null
+        remindersRepository.setError()
+        val reminder = ReminderDataItem(
+            "t",
+            "d",
+            "l",
+            0.0,
+            0.0
+        )
+
+        viewModel.validateAndSaveReminder(reminder)
+        assertEquals(
+            viewModel.showToast.getOrAwaitValue(),
+            ApplicationProvider.getApplicationContext<Context>().getString(R.string.reminder_saved)
+        )
+
     }
 
     @Test

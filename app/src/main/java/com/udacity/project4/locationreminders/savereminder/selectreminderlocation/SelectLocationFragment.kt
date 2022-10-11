@@ -48,7 +48,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         ) {
             map.isMyLocationEnabled = true
         }
-        checkDeviceLocationSettingsAndStartGeofence()
+        checkDeviceLocationSettingsAndSetMyLocation()
         setMapPOI(map)
         setLongClick(map)
         setMapStyle(map)
@@ -171,7 +171,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         else -> super.onOptionsItemSelected(item)
     }
 
-    private fun checkDeviceLocationSettingsAndStartGeofence(resolve: Boolean = true) {
+    private fun checkDeviceLocationSettingsAndSetMyLocation(resolve: Boolean = true) {
         val locationRequest = LocationRequest.create().apply {
             priority = LocationRequest.PRIORITY_LOW_POWER
         }
@@ -197,7 +197,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
                     this.requireView(),
                     R.string.location_required_error, Snackbar.LENGTH_INDEFINITE
                 ).setAction(android.R.string.ok) {
-                    checkDeviceLocationSettingsAndStartGeofence()
+                    checkDeviceLocationSettingsAndSetMyLocation()
                 }.show()
             }
         }

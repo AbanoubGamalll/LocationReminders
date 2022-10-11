@@ -4,12 +4,9 @@ package com.udacity.project4.locationreminders
 import android.app.Activity
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
-import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
-import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.*
-import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.assertion.ViewAssertions.*
 import androidx.test.espresso.matcher.RootMatchers.withDecorView
 import androidx.test.espresso.matcher.ViewMatchers.*
@@ -26,17 +23,22 @@ import com.udacity.project4.util.DataBindingIdlingResource
 import com.udacity.project4.util.monitorActivity
 import com.udacity.project4.utils.EspressoIdlingResource
 import kotlinx.coroutines.runBlocking
-import org.hamcrest.core.IsNot
+import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.Matchers.not
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 import org.koin.test.AutoCloseKoinTest
 import org.koin.test.get
+import org.koin.test.inject
+import java.lang.Thread.sleep
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -90,8 +92,8 @@ class RemindersActivityTest : AutoCloseKoinTest() {
         activityScenario.close()
     }
 
-    private fun getActivity(activityScenario: ActivityScenario<RemindersActivity>): Activity {
-        var activity: Activity?=null
+    private fun getActivity(): Activity {
+        var activity: Activity? = null
         activityScenario.onActivity {
             activity = it
         }
@@ -99,27 +101,26 @@ class RemindersActivityTest : AutoCloseKoinTest() {
     }
 
     @Test
-    fun TestActivity(){
+    fun testFlow() {
 
         onView(withId(R.id.addReminderFAB)).perform(click())
         onView(withId(R.id.reminderTitle)).perform(typeText("T1"))
         onView(withId(R.id.reminderDescription)).perform(typeText("D1"))
         closeSoftKeyboard()
-        Thread.sleep(2000)
+        sleep(2000)
 
         onView(withId(R.id.selectLocation)).perform(click())
         onView(withId(R.id.map)).check(matches(isDisplayed()))
+        sleep(2000)
         onView(withId(R.id.map)).perform(longClick())
-
-        Thread.sleep(2000)
-
         onView(withId(R.id.btn_selectLocation)).perform(click())
 
         onView(withId(R.id.saveReminder)).perform(click())
 
         onView(withText("T1")).check(matches(isDisplayed()))
         onView(withText("D1")).check(matches(isDisplayed()))
-        Thread.sleep(2000)
+
+        sleep(2000)
 
     }
 }
