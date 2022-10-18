@@ -2,10 +2,15 @@ package com.udacity.project4.locationreminders.savereminder.selectreminderlocati
 
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.annotation.TargetApi
+import android.app.Activity
+import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -38,30 +43,19 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     private lateinit var binding: FragmentSelectLocationBinding
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
+    @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
 
-        if (ActivityCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            map.isMyLocationEnabled = true
-        }
-        checkDeviceLocationSettingsAndSetMyLocation()
-        setMapPOI(map)
-        setLongClick(map)
-        setMapStyle(map)
+        setMapPOI()
+        setLongClick()
+        setMapStyle()
     }
 
-    private fun setMyLocation(map: GoogleMap) {
-        val zoomLevel = 13f
-
-        if (ActivityCompat.checkSelfPermission(
-                this.requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) return
+    @SuppressLint("MissingPermission")
+    private fun setMyLocation() {
+        val zoomLevel = 15f
+        map.isMyLocationEnabled = true
 
         fusedLocationProviderClient.lastLocation.addOnSuccessListener(requireActivity())
         {
@@ -80,14 +74,14 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     }
 
 
-    private fun setMapStyle(map: GoogleMap) {
+    private fun setMapStyle() {
         try {
             map.setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.map_style))
         } catch (e: Resources.NotFoundException) {
         }
     }
 
-    private fun setMapPOI(map: GoogleMap) {
+    private fun setMapPOI() {
         map.setOnPoiClickListener {
             map.clear()
             it?.let {
@@ -97,13 +91,19 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         }
     }
 
-    private fun setLongClick(map: GoogleMap) {
+    private fun setLongClick() {
         map.setOnMapLongClickListener() {
             val loc = LatLng(it.latitude, it.longitude)
             map.clear()
             map.addMarker(MarkerOptions().position(loc))
                 .showInfoWindow()
-            onLocationSelected(PointOfInterest(loc, "${loc.latitude},${loc.longitude}", "${loc.latitude},${loc.longitude}"))
+            onLocationSelected(
+                PointOfInterest(
+                    loc,
+                    "${loc.latitude},${loc.longitude}",
+                    "${loc.latitude},${loc.longitude}"
+                )
+            )
         }
     }
 
@@ -115,6 +115,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
         binding.viewModel = _viewModel
         binding.lifecycleOwner = this
+        enableLocationPermission()
 
         setHasOptionsMenu(true)
         setDisplayHomeAsUpEnabled(true)
@@ -135,6 +136,28 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
 
         return binding.root
+    }
+
+
+    private fun enableLocationPermission() {
+        requestPermissions(
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+            10
+        )
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode == 10) {
+            if (grantResults.isNotEmpty() && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+            } else {
+                checkDeviceLocationSettingsAndSetMyLocation()
+            }
+        }
     }
 
     private fun onLocationSelected(p: PointOfInterest) {
@@ -171,7 +194,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         else -> super.onOptionsItemSelected(item)
     }
 
-    private fun checkDeviceLocationSettingsAndSetMyLocation(resolve: Boolean = true) {
+    private fun checkDeviceLocationSettingsAndSetMyLocation() {
         val locationRequest = LocationRequest.create().apply {
             priority = LocationRequest.PRIORITY_LOW_POWER
         }
@@ -182,7 +205,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             settingsClient.checkLocationSettings(builder.build())
 
         locationSettingsResponseTask.addOnFailureListener { exception ->
-            if (exception is ResolvableApiException && resolve) {
+            if (exception is ResolvableApiException) {
                 try {
                     startIntentSenderForResult(
                         exception.resolution.intentSender,
@@ -202,9 +225,8 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             }
         }
         locationSettingsResponseTask.addOnCompleteListener {
-            if (it.isSuccessful) {
-                setMyLocation(map)
-            }
+            if (it.isSuccessful && ::map.isInitialized)
+                setMyLocation()
         }
     }
 }
