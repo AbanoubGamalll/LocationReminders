@@ -117,6 +117,11 @@ class RemindersActivityTest : AutoCloseKoinTest() {
 
         onView(withId(R.id.saveReminder)).perform(click())
 
+//Toast Test
+        onView(withText(R.string.reminder_saved)).inRoot(
+            withDecorView(not(`is`(getActivity().window.decorView)))
+        ).check(matches(isDisplayed()))
+
         onView(withText("T1")).check(matches(isDisplayed()))
         onView(withText("D1")).check(matches(isDisplayed()))
 
