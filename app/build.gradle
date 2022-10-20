@@ -31,15 +31,6 @@ android {
         returnDefaultValues = true
     }
 
-//    packagingOptions {
-//        // for JNA and JNA-platform
-//        exclude "META-INF/AL2.0"
-//        exclude "META-INF/LGPL2.1"
-//        // for byte-buddy
-//        exclude "META-INF/licenses/ASM"
-//        pickFirst "win32-x86-64/attach_hotspot_windows.dll"
-//        pickFirst "win32-x86/attach_hotspot_windows.dll"
-//    }
     buildFeatures {
         dataBinding true
     }
@@ -57,7 +48,6 @@ dependencies {
     implementation "androidx.recyclerview:recyclerview:$recyclerViewVersion"
     implementation "androidx.constraintlayout:constraintlayout:$constraintVersion"
 
-//    implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.google.code.gson:gson:2.8.5'
 
     // Architecture Components
@@ -130,9 +120,6 @@ dependencies {
     //Maps & Geofencing
     implementation "com.google.android.gms:play-services-location:$playServicesVersion"
     implementation "com.google.android.gms:play-services-maps:$playServicesVersion"
-//    implementation "com.google.android.gms:play-services-maps:$playServicesVersionMaps"
-//    implementation "com.google.android.gms:play-services-auth:20.3.0"
-//    implementation "com.google.gms:google-services:4.3.14"
 
     implementation platform('com.google.firebase:firebase-bom:26.5.0')
     //Firebase and Pref

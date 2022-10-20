@@ -46,7 +46,6 @@ class GeofenceTransitionsJobIntentService : JobIntentService(), CoroutineScope {
         if (geofencingEvent.geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER)
             geofencingEvent.triggeringGeofences.forEach { it?.let { sendNotification(it.requestId) } }
 
-//        sendNotification(idd)
 
     }
 

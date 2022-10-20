@@ -43,7 +43,7 @@ class SaveReminderFragment : BaseFragment() {
             requireContext(),
             0,
             intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE/*.FLAG_MUTABLE)*/
+            PendingIntent.FLAG_UPDATE_CURRENT
         )
     }
     private lateinit var geofencingClient: GeofencingClient
@@ -117,8 +117,6 @@ class SaveReminderFragment : BaseFragment() {
             geofencingClient.addGeofences(geofencingRequest, geofencePendingIntent).run {
                 addOnSuccessListener {
                     Log.i("asdGeofences", "geofences_added ${geofence.requestId}")
-//TODO
-//                    idd = myReminder.id
                     _viewModel.saveReminder(myReminder)
                 }
                 addOnFailureListener {
@@ -253,8 +251,6 @@ class SaveReminderFragment : BaseFragment() {
         _viewModel.onClear()
     }
 }
-
-//var idd = ""
 
 private const val REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE = 33
 private const val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 34
