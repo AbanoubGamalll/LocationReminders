@@ -161,7 +161,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             )
         ) {
             if (::map.isInitialized) map.isMyLocationEnabled = true
-            //  checkDeviceLocationSettingsAndSetMyLocation()
+            checkDeviceLocationSettingsAndSetMyLocation()
         } else {
             requestPermissions(
                 arrayOf(
@@ -173,20 +173,20 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     }
 
     //
-    /*
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 60 && requestCode == Activity.RESULT_OK) {
-          //  checkDeviceLocationSettingsAndSetMyLocation()
+            checkDeviceLocationSettingsAndSetMyLocation()
         } else {
             Snackbar.make(
                 this.requireView(),
-                R.string.location_required_error, Snackbar.LENGTH_INDEFINITE
+                R.string.location_required_error, Snackbar.LENGTH_SHORT
             ).setAction(android.R.string.ok) {
-              //  checkDeviceLocationSettingsAndSetMyLocation()
+                checkDeviceLocationSettingsAndSetMyLocation()
             }.show()
         }
-    }*/
+    }
 
     //Done
     @SuppressLint("MissingPermission")
@@ -217,7 +217,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
 
     //
-    /* private fun checkDeviceLocationSettingsAndSetMyLocation() {
+     private fun checkDeviceLocationSettingsAndSetMyLocation() {
          val locationRequest = LocationRequest.create().apply {
              priority = LocationRequest.PRIORITY_LOW_POWER
          }
@@ -241,7 +241,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
              } else {
                  Snackbar.make(
                      this.requireView(),
-                     R.string.location_required_error, Snackbar.LENGTH_INDEFINITE
+                     R.string.location_required_error, Snackbar.LENGTH_SHORT
                  ).setAction(android.R.string.ok) {
                      checkDeviceLocationSettingsAndSetMyLocation()
                  }.show()
@@ -252,7 +252,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
              if (it.isSuccessful) setMyLocation()
          }
      }
- */
+
   
     override fun onStart() {
         super.onStart()
