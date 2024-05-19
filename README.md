@@ -16,5 +16,3 @@
 ![6](https://github.com/AbanoubGamalll/LocationReminders/assets/63438088/1f62c504-0184-4492-9dfa-7c2a506a0f6f)
 
 ![7](https://github.com/AbanoubGamalll/LocationReminders/assets/63438088/1f8b0160-d04d-4b65-8292-6e0371f2c057)
-
-# APK: https://drive.google.com/file/d/1_L9qqKF3-Os5Ufpjj6B-cGkHLqu5SvLP/view?usp=drive_link
