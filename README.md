@@ -1,7 +1,10 @@
 # Location Reminders
 
-#### Developed a Location Reminders app utilizing GPS and Google Maps API for location-based notifications, enhancing productivity through an intuitive UI and seamless backend integration with Firebase.
-#### Using manual and automation testing to enhance the app and discover any bugs.
+> ### Developed a Location Reminders app utilizing GPS and Google Maps API for location-based notifications, enhancing productivity through an intuitive UI and seamless backend integration with Firebase.<br>
+
+> ### Using manual and automation testing to enhance the app and discover any bugs.
+
+
 # Screenshots
 ![1](https://github.com/AbanoubGamalll/LocationReminders/assets/63438088/edfd5a95-6393-466f-8a9f-e744d7115eec)
 
