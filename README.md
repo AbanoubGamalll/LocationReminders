@@ -1,7 +1,7 @@
-# LocationReminders
+# Location Reminders
 
-#### Location Reminder is a TO-DO list app with location reminders that remind the user to do something when the user is at a specific location. The app will require the user to create an account and login to set and access reminders.
-
+#### Developed a Location Reminders app utilizing GPS and Google Maps API for location-based notifications, enhancing productivity through an intuitive UI and seamless backend integration with Firebase.
+#### Using manual and automation testing to enhance the app and discover any bugs.
 # Screenshots
 ![1](https://github.com/AbanoubGamalll/LocationReminders/assets/63438088/edfd5a95-6393-466f-8a9f-e744d7115eec)
 
